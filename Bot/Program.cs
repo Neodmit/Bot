@@ -60,7 +60,8 @@ namespace Bot
         static public float[] GetStatistic(string City)
         {
             string woeid;
-            float max = -99999, max_exp = -99999, difMax = 0, allMax = 0, min = 99999, min_exp = 99999, difMin = 0, allMin = 0, temp = 0, tempAll = 0;
+            float max = -99999, max_exp = -99999, difMax = 0, allMax = 0;
+            float min = 99999, min_exp = 99999, difMin = 0, allMin = 0, temp = 0, tempAll = 0;
             float[] ff=new float[3];    
             string url = $"https://www.metaweather.com/api/location/search/?query="+City;
             string data = http.GetStringAsync(url).Result;
@@ -82,20 +83,20 @@ namespace Bot
                     if (float.Parse($"{r2.min_temp}") < min_exp) min_exp = float.Parse($"{r2.min_temp}");
                     temp =temp+float.Parse($"{r2.the_temp}");
                 }
-                temp /= 7;
-                tempAll += temp;
-                difMax = max_exp - max;
-                if (difMax < 0) difMax *= -1;
-                allMax = (allMax + difMax);
-                difMin = min_exp - min;
-                if (difMin < 0) difMin *= -1;
-                allMin = (allMin + difMin);
-                  day++;
+                temp /= 7;//Тут считаю темпу среднее за часы
+                tempAll += temp;//Для подсчета среднего за день 
+                difMax = max_exp - max;//Ищу разницу между ожидаемым максимальным ожидаемым и максмальным
+                if (difMax < 0) difMax *= -1;//Если разница отриц, Делаю полож
+                allMax = (allMax + difMax);//Для подсчета среднего
+                difMin = min_exp - min;//Ищу разницу между мин ожидаемым и минимальны
+                if (difMin < 0) difMin *= -1;//Если разница отриц, Делаю полож
+                allMin = (allMin + difMin);//Для подсчета среднего
+                day++;
             }
 
-            ff[0] = tempAll / day;
-            ff[1] = allMax / day;
-            ff[2] = allMin / day;
+            ff[0] = tempAll / day;//Среднее за день
+            ff[1] = allMax / day;//Среднее максимальное
+            ff[2] = allMin / day;//Среднее минимальное
 
             return ff;
         }
@@ -142,10 +143,7 @@ namespace Bot
 
                         }
                         else {
-                            client.SendTextMessageAsync(
-                                e.Message.Chat.Id,
-                                    "IDK"
-                                    );
+                            client.SendTextMessageAsync(e.Message.Chat.Id, "IDK");
                         }
                     }
                 };
